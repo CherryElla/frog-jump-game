@@ -1,6 +1,7 @@
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 
+
 // Game Variables
 let score;
 let scoreBoard;
@@ -32,6 +33,7 @@ class Player {
         this.origHeight = height;
         this.earthed = false;
         this.jumpTimer = 0;
+        this.image = document.getElementById("playerImage"); 
     }
     Animate() {
         // Jumping
@@ -78,10 +80,7 @@ class Player {
     }
 
     Draw() {
-        context.beginPath();
-        context.fillStyle = this.color;
-        context.fillRect(this.x, this.y, this.width, this.height);
-        context.closePath();
+        context.drawImage(this.image, this.x, this.y, this.width, this.height)
     }
 }
 
@@ -92,8 +91,8 @@ class Obstacle {
         this.w = w;
         this.h = h;
         this.color = color;
-
         this.dx = -speed;
+        this.image = document.getElementById("flyImage");
     }
     Update() {
         this.x += this.dx;
@@ -102,10 +101,23 @@ class Obstacle {
     }
 
     Draw() {
-        context.beginPath();
-        context.fillStyle = this.color;
-        context.fillRect(this.x, this.y, this.w, this.h);
-        context.closePath();
+        context.drawImage(this.image, this.x, this.y, this.w, this.h)
+        // context.beginPath();
+        // context.fillStyle = this.color;
+        // context.fillRect(this.x, this.y, this.w, this.h);
+        // context.closePath();
+    }
+}
+class Ground {
+    constructor(x,y,w,h){
+        this.x =x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.image = document.getElementById("ground")
+    }
+    Draw(){
+        context.drawImage(this.image, this.x, this.y, this.w, this.h) 
     }
 }
 
@@ -158,6 +170,7 @@ function StartGame() {
     score = 0;
     player = new Player(25, 0, 50, 50, "#9966ff");
     scoreBoard = new Text("Score: " + score, 25, 25, "left", "#660066", "20");
+    let ground = new Ground(25, 0, 100, 70)
 
     requestAnimationFrame(Update);
 }
