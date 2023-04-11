@@ -17,12 +17,19 @@
         </style>
     </head>
     <body>
-        <canvas id="game" width="640px" height="400px"></canvas>
+        <div id="menu" style="display: flex; flex-direction: column; margin: auto; width: 100px; margin-top: 50%;
+        ">
+                <p>FROG GAME</p>
+                <button id="startBtn">START GAME</button>
+
+        </div>
+        <canvas display="none" id="game" width="640px" height="400px"></canvas>
 
         <div style="display: none">
             <img id="playerImage" src="images/frog.png" />
-            <img id="flyImage" src="images/fly.png" />
+            <img id="rockImage" src="images/rock.png" />
             <img id="ground" src="images/ground.png" />
+            <img id="birdImage" src="images/bird.png" />
         </div>
         <script src="script.js"></script>
     </body>

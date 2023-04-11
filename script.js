@@ -1,24 +1,43 @@
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
-
-
+const startBtn = document.getElementById("startBtn");
+const menu = document.getElementById("menu")
 // Game Variables
 let score;
 let scoreBoard;
+let ground;
+let groundHeight = 50;
 let player;
 let gravity;
 let obstacles = [];
 let speed;
 let keys = {};
 
+startBtn.addEventListener("click",  (e) => {
+    menu.style.display = "none"
+    StartGame()
+})
+
+window.addEventListener("resize", function (e) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ground.onResize();
+});
+
+// Event listeners to grab key pressed / unpressed
 document.addEventListener("keydown", function (e) {
     keys[e.code] = true;
-    console.log(e.code)
+    console.log(e.code);
 });
 document.addEventListener("keyup", function (e) {
     keys[e.code] = false;
 });
 
+function groundTopCalc(canvas, ground) {
+    return canvas.height - ground.height;
+}
+
+// Frog player
 class Player {
     constructor(x, y, width, height, color) {
         this.x = x;
@@ -33,7 +52,7 @@ class Player {
         this.origHeight = height;
         this.earthed = false;
         this.jumpTimer = 0;
-        this.image = document.getElementById("playerImage"); 
+        this.image = document.getElementById("playerImage");
     }
     Animate() {
         // Jumping
@@ -43,29 +62,29 @@ class Player {
             this.jumpTimer = 0;
         }
         // Moving
-        if(keys["KeyA"] && this.x > 0){
-            this.x = this.x - this.dx
+        if (keys["KeyA"] && this.x > 0) {
+            this.x = this.x - this.dx;
         }
-        if(keys["KeyD"] && this.x < canvas.width - this.width){
-            this.x = this.x + this.dx
+        if (keys["KeyD"] && this.x < canvas.width - this.width) {
+            this.x = this.x + this.dx;
         }
-        
         // Ducking
         if (keys["ShiftLeft"]) {
             this.height = this.origHeight / 2;
         } else {
             this.height = this.origHeight;
-        }  
+        }
         this.y = this.y + this.dy;
 
         // Gravity
-        if (this.y + this.height < canvas.height) {
+        let groundY = groundTopCalc(canvas, ground); //canvas.height;
+        if (this.y + this.height < groundY) {
             this.dy += gravity;
             this.earthed = false;
         } else {
             this.dy = 0;
             this.earthed = true;
-            this.y = canvas.height - this.height;
+            this.y = groundY - this.height;
         }
         this.Draw();
     }
@@ -80,19 +99,18 @@ class Player {
     }
 
     Draw() {
-        context.drawImage(this.image, this.x, this.y, this.width, this.height)
+        context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
 
 class Obstacle {
-    constructor(x, y, w, h, color) {
+    constructor(x, y, w, h) {
         this.x = x;
         this.y = y;
-        this.w = w;
-        this.h = h;
-        this.color = color;
+        this.width = w;
+        this.height = h;
         this.dx = -speed;
-        this.image = document.getElementById("flyImage");
+        this.image = null;
     }
     Update() {
         this.x += this.dx;
@@ -101,23 +119,44 @@ class Obstacle {
     }
 
     Draw() {
-        context.drawImage(this.image, this.x, this.y, this.w, this.h)
-        // context.beginPath();
-        // context.fillStyle = this.color;
-        // context.fillRect(this.x, this.y, this.w, this.h);
-        // context.closePath();
+        context.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
+}
+
+class Rock extends Obstacle {
+    constructor(x, y, w, h) {
+        super(x, y, w, h);
+        this.image = document.getElementById("rockImage");
+    }
+}
+class Bird extends Obstacle {
+    constructor(x, y, w, h) {
+        super(x, y, w, h);
+        this.image = document.getElementById("birdImage");
     }
 }
 class Ground {
-    constructor(x,y,w,h){
-        this.x =x;
+    constructor(x, y, w, h, c) {
+        this.x = x;
         this.y = y;
-        this.w = w;
-        this.h = h;
-        this.image = document.getElementById("ground")
+        this.width = w;
+        this.height = h;
+        this.c = c;
+        // this.image = document.getElementById("ground")
     }
-    Draw(){
-        context.drawImage(this.image, this.x, this.y, this.w, this.h) 
+
+    onResize() {
+        ground.width = window.innerWidth;
+        ground.height = groundHeight;
+        ground.y = groundTopCalc(canvas, this);
+    }
+
+    Draw() {
+        // context.drawImage(this.image, this.x, this.y, this.w, this.h)
+        context.beginPath();
+        context.fillStyle = this.c;
+        context.fillRect(this.x, this.y, this.width, this.height);
+        context.closePath();
     }
 }
 
@@ -141,19 +180,30 @@ class Text {
     }
 }
 
-function SpawnObst() {
-    let type = RandomIntBetween(0, 1);
+function SpawnRock() {
+    // let type = RandomIntBetween(0, 1);
     let size = RandomIntBetween(20, 70);
-    let obst = new Obstacle(
+    let obst = new Rock(
         canvas.width + size,
-        canvas.height - size,
+        groundTopCalc(canvas, ground) - size,
         size,
-        size,
-        "#0099ff"
+        size
     );
-    if (type == 1) {
-        obst.y -= player.origHeight - 10;
-    }
+    // if (type == 1) {
+    //     obst.y -= player.origHeight - 10;
+    // }
+    obstacles.push(obst);
+}
+
+function SpawnBird() {
+    let size = RandomIntBetween(20, 70);
+    let obst = new Bird(
+        canvas.width + size,
+        groundTopCalc(canvas, ground) - size,
+        size,
+        size
+    );
+    obst.y -= player.origHeight - 10;
     obstacles.push(obst);
 }
 
@@ -170,42 +220,54 @@ function StartGame() {
     score = 0;
     player = new Player(25, 0, 50, 50, "#9966ff");
     scoreBoard = new Text("Score: " + score, 25, 25, "left", "#660066", "20");
-    let ground = new Ground(25, 0, 100, 70)
+    ground = new Ground(0, canvas.height - 50, canvas.width, 50, "#864d2d");
 
     requestAnimationFrame(Update);
 }
 
-let startSpawnTimer = 200;
-let spawnTimer = startSpawnTimer;
+function hitCheck(object1, object2) {
+    return (
+        object1.x < object2.x + object2.width &&
+        object1.x + object1.width > object2.x &&
+        object1.y < object2.y + object2.height &&
+        object1.y + object1.height > object2.y
+    );
+}
+
+let startSpawnTime = 200;
+let spawnBirdTimer = RandomIntBetween(150,450)
+let spawnTimer = startSpawnTime;
 function Update() {
     requestAnimationFrame(Update);
     context.clearRect(0, 0, canvas.width, canvas.height);
-
+    ground.Draw();
     spawnTimer--;
+    spawnBirdTimer--;
     if (spawnTimer <= 0) {
-        SpawnObst();
-        console.log(obstacles);
-        spawnTimer = startSpawnTimer - speed * 8;
+        SpawnRock();
+
+        spawnTimer = startSpawnTime - speed * 8;
         if (spawnTimer < 60) {
             spawnTimer = 60;
         }
+    }
+    if(spawnBirdTimer <= 0) {
+        SpawnBird(); 
+        low = 150 - speed * 8;
+        high = 450 - speed * 8;
+        spawnBirdTimer = RandomIntBetween(low, high)
     }
 
     // Spawning Danger
     for (let i = 0; i < obstacles.length; i++) {
         let ob = obstacles[i];
-        if (ob.x + ob.w < 0) {
+        if (ob.x + ob.width < 0) {
             obstacles.splice(i, 1);
         }
-        if (
-            player.x < ob.x + ob.w &&
-            player.x + player.width > ob.x &&
-            player.y < ob.y + ob.h &&
-            player.y + player.height > ob.y
-        ) {
+        if (hitCheck(player, ob)) {
             obstacles = [];
             score = 0;
-            spawnTimer = startSpawnTimer;
+            spawnTimer = startSpawnTime;
             speed = 3;
         }
         ob.Update();
@@ -218,4 +280,4 @@ function Update() {
     speed += 0.003;
 }
 
-StartGame();
+// StartGame();
