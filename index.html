@@ -5,30 +5,52 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Frog Jump Game</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500&display=swap" rel="stylesheet">
         <style>
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
+                font-family: 'DynaPuff', cursive;
             }
             canvas {
                 display: block;
+                background-image: url("images/landscape.png");
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center;
+                /* opacity: 90%; */
             }
         </style>
     </head>
     <body>
-        <div id="menu" style="display: flex; flex-direction: column; margin: auto; width: 100px; margin-top: 50%;
-        ">
-                <p>FROG GAME</p>
-                <button id="startBtn">START GAME</button>
-
+        <div
+            id="menu"
+            style="
+                position: absolute;
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+                top: 50%;
+                left: 46%;
+            "
+        >
+            <p style="font-size: larger; margin-bottom: 20px">FROG JUMP</p>
+            <button id="startBtn" style="background-color: chartreuse; border-radius: 10px; ">Start Game</button>
         </div>
-        <canvas display="none" id="game" width="640px" height="400px"></canvas>
+        <canvas
+            display="none"
+            id="game"
+            width=""
+            height="700px"
+            style="height: 100%; width: 100%"
+        ></canvas>
 
         <div style="display: none">
             <img id="playerImage" src="images/frog.png" />
             <img id="rockImage" src="images/rock.png" />
-            <img id="ground" src="images/ground.png" />
             <img id="birdImage" src="images/bird.png" />
         </div>
         <script src="script.js"></script>

@@ -173,7 +173,7 @@ class Text {
     Draw() {
         context.beginPath();
         context.fillStyle = this.color;
-        context.font = this.s + "px ariel";
+        context.font = this.s + "px DynaPuff";
         context.textAlign = this.align;
         context.fillText(this.text, this.x, this.y);
         context.closePath();
@@ -214,7 +214,7 @@ function RandomIntBetween(min, max) {
 function StartGame() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    context.font = "20px ariel";
+    context.font = "20px DynaPuff";
     speed = 3;
     gravity = 1;
     score = 0;
