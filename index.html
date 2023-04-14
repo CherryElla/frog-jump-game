@@ -5,15 +5,18 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Frog Jump Game</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
         <style>
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
-                font-family: 'DynaPuff', cursive;
+                font-family: "DynaPuff", cursive;
             }
             canvas {
                 display: block;
@@ -33,18 +36,47 @@
                 display: flex;
                 flex-direction: column;
                 text-align: center;
-                top: 50%;
+                top: 46%;
                 left: 46%;
             "
         >
-            <p style="font-size: larger; margin-bottom: 20px">FROG JUMP</p>
-            <button id="startBtn" style="background-color: chartreuse; border-radius: 10px; ">Start Game</button>
+            <p style="font-size: larger; margin-bottom: 10px">FROG JUMP</p>
+            <small style="color: aliceblue">SHIFT = DUCK</small>
+            <small style="color: aliceblue">SPACE = JUMP</small>
+            <small style="color: aliceblue">A = LEFT</small>
+            <small style="color: aliceblue">D = RIGHT</small>
+            <button
+                id="startBtn"
+                style="
+                    background-color: chartreuse;
+                    border-radius: 10px;
+                    padding: 5px;
+                    margin-top: 10px;
+                "
+            >
+                Start Game
+            </button>
         </div>
+        <button
+            id="restartBtn"
+            style="
+                display: none;
+                position: absolute;
+                text-align: center;
+                top: 50%;
+                left: 46%;
+                background-color: red;
+                border-radius: 10px;
+                padding: 5px;
+            "
+        >
+            Restart Game
+        </button>
         <canvas
             display="none"
             id="game"
             width=""
-            height="700px"
+            height="500px"
             style="height: 100%; width: 100%"
         ></canvas>
 
@@ -52,6 +84,7 @@
             <img id="playerImage" src="images/frog.png" />
             <img id="rockImage" src="images/rock.png" />
             <img id="birdImage" src="images/bird.png" />
+            <img id="redFrogImage" src="images/red-frog.png" alt="" />
         </div>
         <script src="script.js"></script>
     </body>

@@ -1,8 +1,16 @@
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 const startBtn = document.getElementById("startBtn");
-const menu = document.getElementById("menu")
+const menu = document.getElementById("menu");
+const restartBtn = document.getElementById("restartBtn");
+
+// Game states
+const MAIN_MENU = 0;
+const GAME_PLAY = 1;
+const GAME_OVER = 2;
+
 // Game Variables
+let state = MAIN_MENU;
 let score;
 let scoreBoard;
 let ground;
@@ -12,11 +20,20 @@ let gravity;
 let obstacles = [];
 let speed;
 let keys = {};
+let startSpawnTime;
+let spawnBirdTimer;
+let spawnTimer;
 
-startBtn.addEventListener("click",  (e) => {
-    menu.style.display = "none"
-    StartGame()
-})
+startBtn.addEventListener("click", (e) => {
+    menu.style.display = "none";
+    StartGame();
+});
+
+restartBtn.addEventListener("click", (e) => {
+    menu.style.display = "none";
+    restartBtn.style.display = "none"; 
+    StartGame();
+});
 
 window.addEventListener("resize", function (e) {
     canvas.width = window.innerWidth;
@@ -53,6 +70,7 @@ class Player {
         this.earthed = false;
         this.jumpTimer = 0;
         this.image = document.getElementById("playerImage");
+        this.hitImage = document.getElementById("redFrogImage");
     }
     Animate() {
         // Jumping
@@ -88,6 +106,7 @@ class Player {
         }
         this.Draw();
     }
+
     Jump() {
         if (this.earthed && this.jumpTimer == 0) {
             this.jumpTimer = 1;
@@ -99,7 +118,13 @@ class Player {
     }
 
     Draw() {
-        context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        let img;
+        if (state == GAME_OVER) {
+            img = this.hitImage;
+        } else {
+            img = this.image;
+        }
+        context.drawImage(img, this.x, this.y, this.width, this.height);
     }
 }
 
@@ -113,7 +138,9 @@ class Obstacle {
         this.image = null;
     }
     Update() {
-        this.x += this.dx;
+        if (state == GAME_PLAY) {
+            this.x += this.dx;
+        }
         this.Draw();
         this.dx = -speed;
     }
@@ -215,12 +242,17 @@ function StartGame() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     context.font = "20px DynaPuff";
+    obstacles = []
     speed = 3;
     gravity = 1;
     score = 0;
+    startSpawnTime = 200;
+    spawnBirdTimer = RandomIntBetween(150, 450);
+    spawnTimer = startSpawnTime;
     player = new Player(25, 0, 50, 50, "#9966ff");
     scoreBoard = new Text("Score: " + score, 25, 25, "left", "#660066", "20");
     ground = new Ground(0, canvas.height - 50, canvas.width, 50, "#864d2d");
+    state = GAME_PLAY;
 
     requestAnimationFrame(Update);
 }
@@ -234,50 +266,55 @@ function hitCheck(object1, object2) {
     );
 }
 
-let startSpawnTime = 200;
-let spawnBirdTimer = RandomIntBetween(150,450)
-let spawnTimer = startSpawnTime;
 function Update() {
-    requestAnimationFrame(Update);
     context.clearRect(0, 0, canvas.width, canvas.height);
     ground.Draw();
-    spawnTimer--;
-    spawnBirdTimer--;
-    if (spawnTimer <= 0) {
-        SpawnRock();
+    if (state == GAME_PLAY) {
+        requestAnimationFrame(Update);
+        spawnTimer--;
+        spawnBirdTimer--;
+        if (spawnTimer <= 0) {
+            SpawnRock();
 
-        spawnTimer = startSpawnTime - speed * 8;
-        if (spawnTimer < 60) {
-            spawnTimer = 60;
+            spawnTimer = startSpawnTime - speed * 8;
+            if (spawnTimer < 60) {
+                spawnTimer = 60;
+            }
         }
-    }
-    if(spawnBirdTimer <= 0) {
-        SpawnBird(); 
-        low = 150 - speed * 8;
-        high = 450 - speed * 8;
-        spawnBirdTimer = RandomIntBetween(low, high)
-    }
+        if (spawnBirdTimer <= 0) {
+            SpawnBird();
+            low = 150 - speed * 8;
+            high = 450 - speed * 8;
+            spawnBirdTimer = RandomIntBetween(low, high);
+        }
 
-    // Spawning Danger
-    for (let i = 0; i < obstacles.length; i++) {
-        let ob = obstacles[i];
-        if (ob.x + ob.width < 0) {
-            obstacles.splice(i, 1);
-        }
-        if (hitCheck(player, ob)) {
-            obstacles = [];
-            score = 0;
-            spawnTimer = startSpawnTime;
-            speed = 3;
-        }
-        ob.Update();
-    }
+        // Spawning Danger
+        for (let i = 0; i < obstacles.length; i++) {
+            let ob = obstacles[i];
+            if (ob.x + ob.width < 0) {
+                obstacles.splice(i, 1);
+            }
+            if (hitCheck(player, ob)) {
+                state = GAME_OVER;
 
-    player.Animate();
-    score++;
-    scoreBoard.text = "Score: " + score;
-    scoreBoard.Draw();
-    speed += 0.003;
+                return;
+            }
+            ob.Update();
+        }
+
+        player.Animate();
+        score++;
+        scoreBoard.text = "Score: " + score;
+        scoreBoard.Draw();
+        speed += 0.003;
+    } else {
+        player.Animate();
+        obstacles.forEach((o) => o.Update());
+        scoreBoard.Draw();
+        restartBtn.style.display = "block";
+
+        stop();
+    }
 }
 
 // StartGame();
