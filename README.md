@@ -1,9 +1,12 @@
-<h1 style="text-align: center;">FROG JUMP GAME</h1>
 
-![Untitled design (11)](https://user-images.githubusercontent.com/111384784/232032824-485ce281-6822-46a0-97bc-086be29f7724.png)
+<table align="center"><tr><td align="center" width="9999">
+<img src="/images/frog.png" align="center" width="150">
+  
+# FROG JUMP GAME
 
 
 Welcome to my first little game project! Help the little frog jump and duck as many obstacles as you can! 
+</td></tr></table>
 
 ## Installation 
 
